@@ -1,50 +1,43 @@
-export default (() => {
+export default (async () => {
   const nameContainer = document.querySelector('.pokemon-name')
   const typeOneContainer = document.querySelector('.type:nth-of-type(1) span')
   const typeTwoContainer = document.querySelector('.type:nth-of-type(2) span')
-  const pokemonImage = document.querySelector('.pokemon-image')
-  const shinyImage = document.querySelector('.pokemon-image.shiny')
+  const pokemoncall = document.querySelector('.pokemon-call')
+  const shinycall = document.querySelector('.pokemon-call.shiny')
   const buttonsContainer = document.querySelector('.buttons')
-  const apiUrlBase = 'https://pokeapi.co/api/v2/pokemon/'
-  const apiGeneralQuery = '?limit=2000&offset=0'
-  let apiCalls = []
+  const apiUrlBase = 'https://pokeapi.co/api/v2/pokemon/?limit=2000&offset=0'
+  // let apiCalls = []
   let pokemonNumber = 91;
 
-  fetch(apiUrlBase+apiGeneralQuery)
-  .then(response => {
+  try{
+    const response =  await fetch(apiUrlBase)
+
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-    return response.json();
-  })
-  .then(data => {
+
+    const data = await response.json()
     let results = data.results 
-    console.log(results)
-    for (let i = 0; i < results.length; i++) {
-      fetch(results[i].url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+
+    let apiCalls = await Promise.all(
+      results.map( async (result, index) => {
+        const response = await fetch(result.url);
+        const pokemonData = await response.json();
+
+        if (typeof pokemonData.sprites.other['official-artwork'].front_default === 'string') {
+          return result.url;
         }
-        return response.json();
-      })
-      .then(pokemonData => {
-        if(pokemonData.sprites.other['official-artwork'].front_default) {
-          console.log('hola')
-          apiCalls[i] = results[i].url;
-        }
-      })
-    }
-  })
-  .then(_ => {
+      }
+    ))
+    apiCalls = apiCalls.filter(call => call !== undefined);
+
     console.log(apiCalls)
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  })
+    loadInfo()
 
+  }catch(error){
+    console.log(error)
+  }
 
-  loadInfo()
   buttonsContainer?.addEventListener('click', (event) => {
     if (event.target.closest('.next')) {
       pokemonNumber++
@@ -55,8 +48,12 @@ export default (() => {
       loadInfo()
     }
   })
+
   function loadInfo() {
-    let apiUrl = apiUrlBase + pokemonNumber;
+    // let apiUrl = apiUrlBase + pokemonNumber;
+    console.log(apiCalls)
+    let apiUrl = apiCalls[pokemonNumber]
+    console.log(apiUrl)
     fetch(apiUrl)
     .then(response => {
       if (!response.ok) {
@@ -73,8 +70,8 @@ export default (() => {
       } else {
         typeTwoContainer.innerHTML = 'none'
       }
-      pokemonImage.src = pokemonData.sprites.other['official-artwork'].front_default
-      shinyImage.src = pokemonData.sprites.other['official-artwork'].front_shiny
+      pokemoncall.src = pokemonData.sprites.other['official-artwork'].front_default
+      shinycall.src = pokemonData.sprites.other['official-artwork'].front_shiny
     })
     .catch(error => {
       console.error('Error:', error);
