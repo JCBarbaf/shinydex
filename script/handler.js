@@ -2,8 +2,8 @@ export default (async () => {
   const nameContainer = document.querySelector('.pokemon-name')
   const typeOneContainer = document.querySelector('.type:nth-of-type(1) span')
   const typeTwoContainer = document.querySelector('.type:nth-of-type(2) span')
-  const pokemoncall = document.querySelector('.pokemon-call')
-  const shinycall = document.querySelector('.pokemon-call.shiny')
+  const pokemonImage = document.querySelector('.pokemon-call')
+  const shinyImage = document.querySelector('.pokemon-call.shiny')
   const buttonsContainer = document.querySelector('.buttons')
   const apiUrlBase = 'https://pokeapi.co/api/v2/pokemon/?limit=2000&offset=0'
   // let apiCalls = []
@@ -32,7 +32,35 @@ export default (async () => {
     apiCalls = apiCalls.filter(call => call !== undefined);
 
     console.log(apiCalls)
-    loadInfo()
+    let loadInfo = () => {
+      console.log(apiCalls)
+      let apiUrl = apiCalls[pokemonNumber]
+      console.log(apiUrl)
+      fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(pokemonData => {
+        // console.log(pokemonData.types[0].type.name);
+        nameContainer.innerHTML = pokemonData.species.name
+        typeOneContainer.innerHTML = pokemonData.types[0].type.name
+        if (pokemonData.types[1]) {
+          typeTwoContainer.innerHTML = pokemonData.types[1].type.name
+        } else {
+          typeTwoContainer.innerHTML = 'none'
+        }
+        pokemonImage.src = pokemonData.sprites.other['official-artwork'].front_default
+        shinyImage.src = pokemonData.sprites.other['official-artwork'].front_shiny
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+    
+    // loadInfo()
 
   }catch(error){
     console.log(error)
@@ -70,8 +98,8 @@ export default (async () => {
       } else {
         typeTwoContainer.innerHTML = 'none'
       }
-      pokemoncall.src = pokemonData.sprites.other['official-artwork'].front_default
-      shinycall.src = pokemonData.sprites.other['official-artwork'].front_shiny
+      pokemonImage.src = pokemonData.sprites.other['official-artwork'].front_default
+      shinyImage.src = pokemonData.sprites.other['official-artwork'].front_shiny
     })
     .catch(error => {
       console.error('Error:', error);
