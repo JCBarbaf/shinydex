@@ -2,12 +2,12 @@ export default (async () => {
   const nameContainer = document.querySelector('.pokemon-name')
   const typeOneContainer = document.querySelector('.type:nth-of-type(1) span')
   const typeTwoContainer = document.querySelector('.type:nth-of-type(2) span')
-  const pokemonImage = document.querySelector('.pokemon-call')
-  const shinyImage = document.querySelector('.pokemon-call.shiny')
+  const pokemonImage = document.querySelector('.pokemon-image')
+  const shinyImage = document.querySelector('.pokemon-image.shiny')
   const buttonsContainer = document.querySelector('.buttons')
   const apiUrlBase = 'https://pokeapi.co/api/v2/pokemon/?limit=2000&offset=0'
   // let apiCalls = []
-  let pokemonNumber = 91;
+  let pokemonNumber = 1016;
 
   try{
     const response =  await fetch(apiUrlBase)
@@ -19,7 +19,7 @@ export default (async () => {
     const data = await response.json()
     let results = data.results 
 
-    let apiCalls = await Promise.all(
+    var apiCalls = await Promise.all(
       results.map( async (result, index) => {
         const response = await fetch(result.url);
         const pokemonData = await response.json();
@@ -30,37 +30,7 @@ export default (async () => {
       }
     ))
     apiCalls = apiCalls.filter(call => call !== undefined);
-
-    console.log(apiCalls)
-    let loadInfo = () => {
-      console.log(apiCalls)
-      let apiUrl = apiCalls[pokemonNumber]
-      console.log(apiUrl)
-      fetch(apiUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(pokemonData => {
-        // console.log(pokemonData.types[0].type.name);
-        nameContainer.innerHTML = pokemonData.species.name
-        typeOneContainer.innerHTML = pokemonData.types[0].type.name
-        if (pokemonData.types[1]) {
-          typeTwoContainer.innerHTML = pokemonData.types[1].type.name
-        } else {
-          typeTwoContainer.innerHTML = 'none'
-        }
-        pokemonImage.src = pokemonData.sprites.other['official-artwork'].front_default
-        shinyImage.src = pokemonData.sprites.other['official-artwork'].front_shiny
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-    }
-    
-    // loadInfo()
+    loadInfo()
 
   }catch(error){
     console.log(error)
@@ -78,10 +48,7 @@ export default (async () => {
   })
 
   function loadInfo() {
-    // let apiUrl = apiUrlBase + pokemonNumber;
-    console.log(apiCalls)
     let apiUrl = apiCalls[pokemonNumber]
-    console.log(apiUrl)
     fetch(apiUrl)
     .then(response => {
       if (!response.ok) {
@@ -90,7 +57,6 @@ export default (async () => {
       return response.json();
     })
     .then(pokemonData => {
-      // console.log(pokemonData.types[0].type.name);
       nameContainer.innerHTML = pokemonData.species.name
       typeOneContainer.innerHTML = pokemonData.types[0].type.name
       if (pokemonData.types[1]) {
