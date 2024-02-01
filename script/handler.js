@@ -11,17 +11,17 @@ export default (async () => {
   console.log(whiteList.length)
   
   let pokemonNumber = 1016;
-
+  
   try{
     const response =  await fetch(apiUrlBase)
-
+    
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
+    
     const data = await response.json()
     let results = data.results 
-
+    
     var apiCalls = await Promise.all(
       results.map( async (result, index) => {
         if (result.url.split("/")[6] >= 10000) {
@@ -32,13 +32,14 @@ export default (async () => {
         }
         const response = await fetch(result.url);
         const pokemonData = await response.json();
-
+        
         if (typeof pokemonData.sprites.other['official-artwork'].front_default === 'string') {
           return result.url;
         }
       }
     ))
     apiCalls = apiCalls.filter(call => call !== undefined);
+    pokemonNumber = Math.floor(Math.random() * apiCalls.length);
     loadInfo()
 
   }catch(error){
