@@ -40,6 +40,7 @@ export default (async () => {
     ))
     apiCalls = apiCalls.filter(call => call !== undefined);
     pokemonNumber = Math.floor(Math.random() * apiCalls.length);
+    // pokemonNumber = 1;
     loadInfo()
 
   }catch(error){
