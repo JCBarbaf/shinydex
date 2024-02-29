@@ -10,7 +10,7 @@ export default (async () => {
   // tauros-paldea-combat-breed: 10250
   console.log(whiteList.length)
   
-  let pokemonNumber = 1016;
+  let pokemonNumber = 0;
   
   try{
     const response =  await fetch(apiUrlBase)
@@ -39,7 +39,7 @@ export default (async () => {
       }
     ))
     apiCalls = apiCalls.filter(call => call !== undefined);
-    pokemonNumber = Math.floor(Math.random() * apiCalls.length);
+    // pokemonNumber = Math.floor(Math.random() * apiCalls.length);
     // pokemonNumber = 1;
     loadInfo()
 
